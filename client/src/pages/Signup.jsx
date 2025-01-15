@@ -18,10 +18,16 @@
 //     password: "",
 //     profileImage: "",
 //   });
-// const handleChange = (e) => {
-//   const { name, value } = e.target;
-//   setData((prev) => ({ ...prev, [name]: value }));
-// };
+//   const handleChange = (e) =>{
+//       const { name , value } = e.target
+
+//       setData((preve)=>{
+//           return{
+//               ...preve,
+//               [name] : value
+//           }
+//       })
+//   }
 
 //   const handleUploadImage = async (e) => {
 //     const file = e.target.files[0];
@@ -53,27 +59,27 @@
 //     }
 
 //     try {
-//       const url = "https://localhost:3000/auth/signup";
+//       // const url = "https://localhost:3000/auth/signup";
 
-//        const response = axios.post(url, {
+//       //  const response = axios.post(url, {
+//       //    name,
+//       //    email,
+//       //    password,
+//       //    profileImage,
+//       //  })
+  
+//      const response = await fetch("https://localhost:3000/auth/signup", {
+//        method: "POST",
+//        headers: {
+//          "Content-Type": "application/json",
+//        },
+//        body: JSON.stringify({
 //          name,
 //          email,
 //          password,
 //          profileImage,
-//        })
-  
-//     //  const response = await fetch("https://localhost:3000/auth/signup", {
-//     //    method: "POST",
-//     //    headers: {
-//     //      "Content-Type": "application/json",
-//     //    },
-//     //    body: JSON.stringify({
-//     //      name,
-//     //      email,
-//     //      password,
-//     //      profileImage,
-//     //    }),
-//     //  });
+//        }),
+//      });
 
       
 //       const result = await response.json();
