@@ -636,22 +636,23 @@ const Signup = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setData((prev) => ({ ...prev, [name]: value }));
+   const data2 = setData((prev) => ({ ...prev, [name]: value }));
+
   };
 
-  const handleUploadImage = async (e) => {
-    try {
-      const file = e.target.files[0];
-      if (!file) {
-        return handleError("Please select an image.");
-      }
+  // const handleUploadImage = async (e) => {
+  //   try {
+  //     const file = e.target.files[0];
+  //     if (!file) {
+  //       return handleError("Please select an image.");
+  //     }
 
-      const imagePic = await imageToBase64(file);
-      setData((prev) => ({ ...prev, profileImage: imagePic }));
-    } catch (error) {
-      handleError("Error uploading image: " + error.message);
-    }
-  };
+  //     const imagePic = await imageToBase64(file);
+  //     setData((prev) => ({ ...prev, profileImage: imagePic }));
+  //   } catch (error) {
+  //     handleError("Error uploading image: " + error.message);
+  //   }
+  // };
 
   const handleSignup = async (e) => {
     e.preventDefault();
@@ -660,29 +661,32 @@ const Signup = () => {
 
     if (!name || !email || !password) {
       return handleError("(Name & Email & Password) Fields Are Required");
-    }
-
-    try {
-      const response = await axios.post("https://localhost:3000/auth/signup", {
-        name,
-        email,
-        password,
-        profileImage: data.profileImage,
-      });
-
-      if (response.status === 201) {
-        // Assuming 201 Created status code
-        handleSuccess(response.data.message || "Signup successful");
-        setTimeout(() => {
-          navigate("/login");
-        }, 1000);
-      } else {
-        handleError(response.data.error || "Signup failed. Please try again.");
+    } else {
+      
+      try {
+        const response = await axios.post("http://localhost:3000/auth/signup", {
+          name:data.name,
+          email:data.email,
+          password:data.password,
+          profileImage: data.profileImage,
+        });
+  
+        if (response.status === 201) {
+          // Assuming 201 Created status code
+          handleSuccess(response.data.message || "Signup successful");
+          setTimeout(() => {
+            navigate("/login");
+          }, 1000);
+        } else {
+          handleError(response.data.error || "Signup failed. Please try again.");
+        }
+      } catch (error) {
+        handleError("Network error: " + error.message);
       }
-    } catch (error) {
-      handleError("Network error: " + error.message);
     }
+
   };
+   console.log("data login ", data);
 
   // ... (rest of the JSX) ...
 
@@ -764,7 +768,7 @@ const Signup = () => {
                       Upload Photo
                     </div>
                     <input
-                      onChange={handleUploadImage}
+                      // onChange={handleUploadImage}
                       className="hidden"
                       type="file"
                     />
@@ -786,19 +790,7 @@ const Signup = () => {
                       className="bg-transparent border border-gray-400 w-full text-gray-800 text-sm pl-4 pr-10 py-2.5 rounded focus:border-black outline-none"
                       placeholder="Enter name"
                     />
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="#bbb"
-                      stroke="#bbb"
-                      className="w-4 h-4 absolute right-4"
-                      viewBox="0 0 24 24"
-                    >
-                      <circle cx={10} cy={7} r={6} data-original="#000000" />
-                      <path
-                        d="M14 15H6a5 5 0 0 0-5 5 3 3 0 0 0 3 3h12a3 3 0 0 0 3-3 5 5 0 0 0-5-5zm8-4h-2.59l.3-.29a1 1 0 0 0-1.42-1.42l-2 2a1 1 0 0 0 0 1.42l2 2a1 1 0 0 0 1.42 0 1 1 0 0 0 0-1.42l-.3-.29H22a1 1 0 0 0 0-2z"
-                        data-original="#000000"
-                      />
-                    </svg>
+                   
                   </div>
                 </div>
                 <div>
@@ -808,42 +800,14 @@ const Signup = () => {
                   <div className="relative flex items-center">
                     <input
                       name="email"
-                      type="email"
+                      type="text"
                       onChange={handleChange}
                       value={data.email}
                       required
                       className="bg-transparent border border-gray-400 w-full text-gray-800 text-sm pl-4 pr-10 py-2.5 rounded focus:border-black outline-none"
                       placeholder="Enter email"
                     />
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="#bbb"
-                      stroke="#bbb"
-                      className="w-4 h-4 absolute right-4"
-                      viewBox="0 0 682.667 682.667"
-                    >
-                      <defs>
-                        <clipPath id="a" clipPathUnits="userSpaceOnUse">
-                          <path d="M0 512h512V0H0Z" data-original="#000000" />
-                        </clipPath>
-                      </defs>
-                      <g
-                        clipPath="url(#a)"
-                        transform="matrix(1.33 0 0 -1.33 0 682.667)"
-                      >
-                        <path
-                          fill="none"
-                          strokeMiterlimit={10}
-                          strokeWidth={40}
-                          d="M452 444H60c-22.091 0-40-17.909-40-40v-39.446l212.127-157.782c14.17-10.54 33.576-10.54 47.746 0L492 364.554V404c0 22.091-17.909 40-40 40Z"
-                          data-original="#000000"
-                        />
-                        <path
-                          d="M472 274.9V107.999c0-11.027-8.972-20-20-20H60c-11.028 0-20 8.973-20 20V274.9L0 304.652V107.999c0-33.084 26.916-60 60-60h392c33.084 0 60 26.916 60 60v196.653Z"
-                          data-original="#000000"
-                        />
-                      </g>
-                    </svg>
+                   
                   </div>
                 </div>
                 <div>

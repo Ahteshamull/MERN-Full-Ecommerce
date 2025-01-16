@@ -2,19 +2,18 @@ const bcrypt = require("bcrypt");
 const EmailValidateCheck = require("../helpers/EmailvalidateChack");
 const userModel = require("../model/userModel");
 
-
 const userSignup = async (req, res) => {
   try {
-      const { name, email, password } = req.body;
-      if (!name) {
-         return res.status(404).send({ error: " Name is required" });
-      }
-      if (!email) {
-          return res.status(404).send({ error: " Email is required" });
-      }
-      if (!password) {
-        return res.status(404).send({ error: " Password is required" });
-      }
+    const { name, email, password } = req.body;
+    if (!name) {
+      return res.status(404).send({ error: " Name is required" });
+    }
+    if (!email) {
+      return res.status(404).send({ error: " Email is required" });
+    }
+    if (!password) {
+      return res.status(404).send({ error: " Password is required" });
+    }
 
     if (!EmailValidateCheck(email)) {
       return res.status(404).send({ error: " Email Must Be Valid" });
