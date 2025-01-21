@@ -1,27 +1,68 @@
 import React, { useState } from "react";
-import { FaEye } from "react-icons/fa";
-import { FaEyeSlash } from "react-icons/fa";
-import { Link } from "react-router";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { Link, useNavigate } from "react-router-dom"; // Use useNavigate for redirection
+import { handleError, handleSuccess } from "../Util"; // Ensure these are correctly implemented
+import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
 
 const Login = () => {
+  const navigate = useNavigate(); // Add navigate here
   const [showPassword, setShowPassword] = useState(false);
   const [data, setData] = useState({
     email: "",
     password: "",
   });
+
   const handleChange = (e) => {
     setData({ ...data, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-  };
+    const { email, password } = data;
+
+    // Validate email and password
+    if (!email || !password) {
+      return handleError("Both Email & Password fields are required");
+    }
+
+    try {
+      const response = await axios.post(
+        "http://localhost:3000/auth/login",
+        data,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+    
+
+      const { success, message, error } = response.data;
  
+
+      if (success) {
+        handleSuccess(message || "Login successfully");
+        setTimeout(() => {
+          navigate("/"); // Redirect after login
+        }, 1000);
+      } else if (error) {
+        const details = error?.details[0].message;
+        handleError(details);
+      } else if (!success) {
+        handleError(message);
+      }
+    } catch (error) {
+      handleError(error);
+   
+    }
+  };
 
   return (
     <div className="container mx-auto">
       <div className="font-[sans-serif] max-sm:px-4">
-        <div className=" flex flex-col items-center justify-center">
+        <div className="flex flex-col items-center justify-center">
           <div className="grid md:grid-cols-2 items-center gap-4 max-md:gap-8 max-w-6xl max-md:max-w-lg w-full p-4 m-4 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.3)] rounded-md">
             <div className="w-full h-full flex items-center bg-[#000842] rounded-xl p-8">
               <img
@@ -37,7 +78,7 @@ const Login = () => {
                     Sign in
                   </h3>
                   <p className="text-sm mt-4 text-gray-800">
-                    Don't have an account{" "}
+                    Don't have an account?{" "}
                     <Link
                       className="text-blue-600 font-semibold hover:underline ml-1 whitespace-nowrap"
                       to={"/signup"}
@@ -54,26 +95,23 @@ const Login = () => {
                     <input
                       onChange={handleChange}
                       name="email"
-                      type="text"
+                      type="email" // Changed to "email"
                       value={data.email}
-                      required
                       className="w-full text-gray-800 text-sm border-b border-gray-300 focus:border-blue-600 pl-2 pr-8 py-3 outline-none"
                       placeholder="Enter email"
                     />
-                   
                   </div>
                 </div>
                 <div className="mt-8">
                   <label className="text-gray-800 text-xs block mb-2">
                     Password
                   </label>
-                  <div className="relative flex items-center ">
+                  <div className="relative flex items-center">
                     <input
                       onChange={handleChange}
                       name="password"
                       value={data.password}
                       type={showPassword ? "text" : "password"}
-                      required
                       className="w-full text-gray-800 text-sm border-b border-gray-300 focus:border-blue-600 pl-2 pr-8 py-3 outline-none"
                       placeholder="Enter password"
                     />
@@ -101,12 +139,13 @@ const Login = () => {
                 <div className="mt-12">
                   <button
                     type="submit"
-                    className="w-full shadow-xl py-2.5 px-4 text-sm tracking-wide rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none "
+                    className="w-full shadow-xl py-2.5 px-4 text-sm tracking-wide rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none"
                   >
                     Sign in
                   </button>
                 </div>
               </form>
+              <ToastContainer />
             </div>
           </div>
         </div>

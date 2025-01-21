@@ -15,8 +15,13 @@ const UserSchema = new Schema(
     password: {
       type: String,
     },
-    profileImage: {
+    image: {
       type: String,
+    },
+    role: {
+      type: String,
+      enum: ["GENERAL", "ADMIN"],
+      default: "GENERAL",
     },
   },
   {
@@ -24,5 +29,5 @@ const UserSchema = new Schema(
   }
 );
 
-const userModel = mongoose.model("User", UserSchema)
-module.exports = userModel
+const userModel = mongoose.model("User", UserSchema);
+module.exports = userModel;
