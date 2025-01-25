@@ -1,10 +1,53 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router";
 import { FaRegCircleUser } from "react-icons/fa6";
 import { BsCart3 } from "react-icons/bs";
 import logo from "../assets/headerImg.png";
+import { useDispatch, useSelector } from "react-redux";
+import { handleError, handleSuccess } from "./../Util";
+import { ToastContainer } from "react-toastify";
+import { setUser } from "../store/userSlices";
 
 const Header = () => {
+  const user = useSelector((state) => state?.user?.user);
+  const dispatch = useDispatch()
+  const [menu, setMenu] = useState(false)
+
+
+
+
+
+
+
+
+
+
+  const handleLogout = async () => {
+    const fetchData = await fetch("http://localhost:3000/auth/user-logout", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+    const response = await fetchData.json();
+    const { error, success, message } = response;
+    
+  if (success) {
+    handleSuccess(message);
+    dispatch(setUser(null))
+    // Show success message
+    localStorage.removeItem("token"); // Log out the user
+
+    // Delay navigation by 1 second (1000 milliseconds)
+    setTimeout(() => {
+      window.location.href = "/"; // Redirect to home page after delay
+    }, 1000);
+  } else if (error) {
+    handleError(message); // Show error message
+  }
+  };
+  
   return (
     <header className="bg-white py-1 shadow-md">
       <div className="container mx-auto h-full flex justify-between items-center px-4">
@@ -31,10 +74,36 @@ const Header = () => {
         </div>
         <div className="flex gap-6 items-center text-center ">
           <Link to={"/contact"}>
-            <div>
-              <span>
-                <FaRegCircleUser size={30} />
-              </span>
+            <div
+              className="relative group flex justify-center"
+              onClick={() => setMenu((prev) => !prev)}
+            >
+              <div>
+                {user?.image ? (
+                  <img
+                    src={user?.image}
+                    alt="user"
+                    className="w-10 h-10 rounded-full"
+                  />
+                ) : (
+                  <span>
+                    <FaRegCircleUser size={30} />
+                  </span>
+                )}
+              </div>
+              {menu && (
+                <div className=" md:block absolute bg-white bottom-0    h-fit p-4 top-11 shadow-lg rounded-sm hidden group-hover:block">
+                  <nav>
+                    <Link
+                      onClick={() => setMenu((prev) => !prev)}
+                      to={"/admin-panel"}
+                      className="whitespace-nowrap hidden md:block hover:bg-slate-100 p-2"
+                    >
+                      Admin Panel
+                    </Link>
+                  </nav>
+                </div>
+              )}
             </div>
           </Link>
           <Link to={"/card"}>
@@ -47,15 +116,25 @@ const Header = () => {
               </div>
             </div>
           </Link>
-          <Link to={"/login"}>
-            <div>
-              <button className="px-5 py-2.5 rounded-lg text-white text-sm tracking-wider font-medium border border-current outline-none bg-gradient-to-tr hover:bg-gradient-to-tl from-blue-700 to-blue-300">
-                Login
-              </button>
-            </div>
-          </Link>
+          {user?._id ? (
+            <button
+              onClick={handleLogout}
+              className="px-5 py-2.5 rounded-lg text-white text-sm tracking-wider font-medium border border-current outline-none bg-gradient-to-tr hover:bg-gradient-to-tl from-blue-700 to-blue-300"
+            >
+              Logout
+            </button>
+          ) : (
+            <Link to={"/login"}>
+              <div>
+                <button className="px-5 py-2.5 rounded-lg text-white text-sm tracking-wider font-medium border border-current outline-none bg-gradient-to-tr hover:bg-gradient-to-tl from-blue-700 to-blue-300">
+                  Login
+                </button>
+              </div>
+            </Link>
+          )}
         </div>
       </div>
+      <ToastContainer />
     </header>
   );
 };

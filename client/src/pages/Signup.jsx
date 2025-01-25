@@ -69,21 +69,30 @@ const Signup = () => {
       );
 
       const result = response.data;
-      const { success, message } = result;
-      console.log(result)
+      const { success, message, error } = result;
 
       if (success) {
         handleSuccess(message);
         setTimeout(() => {
           navigate("/login");
         }, 1000);
+      } else if (error) {
+        console.log(error);
       }
-      // else if (error) {
-      //   const details = error?.details[0].message;
-      //   handleError(details);
-      // }
     } catch (err) {
-      console.log(err);
+      const { response } = err;
+     
+ if (response && response.data && response.data.error) {
+   const errorMessage = response.data.error.details[0].message;
+   handleError(errorMessage);
+ } else {
+   const { message, success } = response.data
+   if (success) {
+     handleSuccess(message)
+   } else {
+     handleError(message)
+   }
+ }
     }
   };
 

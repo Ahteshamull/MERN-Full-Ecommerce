@@ -1,10 +1,16 @@
-
-const express = require("express")
-const  userSignup= require("../controller/userSignup");
+const express = require("express");
+const userSignup = require("../controller/userSignup");
 const multer = require("multer");
 const path = require("path");
 const userLogin = require("../controller/userSignIn");
-const { loginValidation, signUpValidation } = require("../middleware/authMiddleware");
+const {
+  loginValidation,
+  signUpValidation,
+} = require("../middleware/authMiddleware");
+const userDetails = require("../controller/userDetails");
+const authToken = require("../middleware/authToken");
+const userLogout = require("../controller/userLogout");
+const allUsers = require("../controller/allUsers");
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, "./uploads");
@@ -41,13 +47,22 @@ const upload = multer({
 });
 function errorCheck(err, req, res, next) {
   if (err) {
-    return res.status(500).send({message:err.message})
+    return res.status(500).send({ message: err.message });
   }
-  next()
+  next();
 }
 
-const router = express.Router()
-router.post("/signup",upload.single("image"),errorCheck,signUpValidation,userSignup)
-router.post("/login",loginValidation,userLogin)
+const router = express.Router();
+router.post(
+  "/signup",
+  upload.single("image"),
+  errorCheck,
+  signUpValidation,
+  userSignup
+);
+router.post("/login", loginValidation, userLogin);
+router.get("/user-details", authToken, userDetails);
+router.get("/user-logout", userLogout);
+router.get("/all-users", authToken, allUsers);
 
-module.exports = router
+module.exports = router;

@@ -1,25 +1,29 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom"; // Use useNavigate for redirection
 import { handleError, handleSuccess } from "../Util"; // Ensure these are correctly implemented
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
+import Context from "../context";
 
 const Login = () => {
-  const navigate = useNavigate(); // Add navigate here
+  const navigate = useNavigate();
+  
+  // Add navigate here
   const [showPassword, setShowPassword] = useState(false);
-  const [data, setData] = useState({
+  const {fetchUserDetails} = useContext(Context);
+  const [loginInfo, setLoginInfo] = useState({
     email: "",
     password: "",
   });
 
   const handleChange = (e) => {
-    setData({ ...data, [e.target.name]: e.target.value });
+    setLoginInfo({ ...loginInfo, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const { email, password } = data;
+    const { email, password } = loginInfo;
 
     // Validate email and password
     if (!email || !password) {
@@ -29,34 +33,48 @@ const Login = () => {
     try {
       const response = await axios.post(
         "http://localhost:3000/auth/login",
-        data,
+        loginInfo, // This is the request body
         {
           headers: {
-            "Content-Type": "application/json",
+            "Content-Type": "application/json", // Set Content-Type to application/json
           },
+          // Use withCredentials to include cookies or credentials
         }
       );
 
     
 
-      const { success, message, error } = response.data;
- 
-
-      if (success) {
-        handleSuccess(message || "Login successfully");
-        setTimeout(() => {
-          navigate("/"); // Redirect after login
-        }, 1000);
-      } else if (error) {
-        const details = error?.details[0].message;
-        handleError(details);
-      } else if (!success) {
-        handleError(message);
-      }
-    } catch (error) {
-      handleError(error);
-   
-    }
+      const result = response.data;
+      console.log(result)
+          const { success, message,token, name, error } = result;
+    
+          if (success) {
+            handleSuccess(message);
+            localStorage.setItem("token", token);
+            localStorage.setItem("loggedIn", loginInfo.email);
+            setTimeout(() => {
+             window.location.href = "/";
+            }, 1000);
+            fetchUserDetails();
+          } else if (error) {
+            console.log(error);
+          }
+        } catch (err) {
+          const { response } = err;
+         
+     if (response && response.data && response.data.error) {
+       const errorMessage = response.data.error.details[0].message;
+       handleError(errorMessage);
+     } else {
+       
+       const { message, success } = response.data
+       if (success) {
+         handleSuccess(message)
+       } else {
+         handleError(message)
+       }
+     }
+        }
   };
 
   return (
@@ -96,7 +114,7 @@ const Login = () => {
                       onChange={handleChange}
                       name="email"
                       type="email" // Changed to "email"
-                      value={data.email}
+                      value={loginInfo.email}
                       className="w-full text-gray-800 text-sm border-b border-gray-300 focus:border-blue-600 pl-2 pr-8 py-3 outline-none"
                       placeholder="Enter email"
                     />
@@ -110,13 +128,13 @@ const Login = () => {
                     <input
                       onChange={handleChange}
                       name="password"
-                      value={data.password}
+                      value={loginInfo.password}
                       type={showPassword ? "text" : "password"}
                       className="w-full text-gray-800 text-sm border-b border-gray-300 focus:border-blue-600 pl-2 pr-8 py-3 outline-none"
                       placeholder="Enter password"
                     />
                     <div
-                      className="absolute top-1 right-2 cursor-pointer"
+                      className="absolute top-[10px] right-2 cursor-pointer"
                       onClick={() => setShowPassword((prev) => !prev)}
                     >
                       <span>

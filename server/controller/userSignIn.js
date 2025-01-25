@@ -34,29 +34,28 @@ const userLogin = async (req, res) => {
     );
 
     if (isPasswordCorrect) {
-      const loginUserInfo = {
-        id: existingUser._id,
-        name: existingUser.name,
-        email: existingUser.email,
-        role: existingUser.role,
-      };
+     
 
       // Set token expiration based on role
       const tokenExpiry = existingUser.role === "ADMIN" ? "5m" : "24h";
-      const token = jwt.sign({ loginUserInfo }, process.env.PRV_TOKEN, {
+      const tokenData = {
+        _id: existingUser._id,
+        email: existingUser.email,
+      }
+      const token = jwt.sign(tokenData, process.env.PRV_TOKEN, {
         expiresIn: tokenExpiry,
       });
 
       // Send the token as a secure HTTP-only cookie
       res.cookie("token", token, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production", // Use secure cookies in production
+        secure: true // Use secure cookies in production
       });
 
       return res.status(200).send({
         message: `${existingUser.role} Login Successfully`,
         success: true,
-        data: loginUserInfo,
+        
         token,
       });
     } else {
