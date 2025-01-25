@@ -4,6 +4,7 @@ const  userSignup= require("../controller/userSignup");
 const multer = require("multer");
 const path = require("path");
 const userLogin = require("../controller/userSignIn");
+const { loginValidation, signUpValidation } = require("../middleware/authMiddleware");
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, "./uploads");
@@ -46,7 +47,7 @@ function errorCheck(err, req, res, next) {
 }
 
 const router = express.Router()
-router.post("/signup",upload.single("image"),errorCheck,userSignup)
-router.post("/login",userLogin)
+router.post("/signup",upload.single("image"),errorCheck,signUpValidation,userSignup)
+router.post("/login",loginValidation,userLogin)
 
 module.exports = router

@@ -10,7 +10,7 @@ import { handleError, handleSuccess } from "../Util";
 const Signup = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
-  const [data, setData] = useState({
+  const [signUpInfo, setSignUpInfo] = useState({
     name: "",
     email: "",
     password: "",
@@ -20,14 +20,14 @@ const Signup = () => {
   // Handle input changes (text fields)
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setData((prev) => ({ ...prev, [name]: value }));
+    setSignUpInfo((prev) => ({ ...prev, [name]: value }));
   };
 
   // Handle image selection
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setData((prev) => ({
+      setSignUpInfo((prev) => ({
         ...prev,
         image: file,
       }));
@@ -37,7 +37,7 @@ const Signup = () => {
   const handleSignup = async (e) => {
     e.preventDefault();
 
-    const { name, email, password, image } = data;
+    const { name, email, password, image } = signUpInfo;
 
     if (!name) {
       return handleError("Name must be provided");
@@ -57,22 +57,34 @@ const Signup = () => {
       formData.append("image", image);
     }
 
-   try {
-     const response = await axios.post(
-       "http://localhost:3000/auth/signup",
-       formData,
-       {
-         headers: {
-           "Content-Type": "multipart/form-data",
-         },
-       }
-     );
-     const { success, message, error } = response.data;
-    
-   } catch (error) {
-     console.log(error)
-   }
-    
+    try {
+      const response = await axios.post(
+        "http://localhost:3000/auth/signup",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      const result = response.data;
+      const { success, message } = result;
+      console.log(result)
+
+      if (success) {
+        handleSuccess(message);
+        setTimeout(() => {
+          navigate("/login");
+        }, 1000);
+      }
+      // else if (error) {
+      //   const details = error?.details[0].message;
+      //   handleError(details);
+      // }
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   return (
@@ -137,8 +149,8 @@ const Signup = () => {
                   <div>
                     <img
                       src={
-                        data.image
-                          ? URL.createObjectURL(data.image)
+                        signUpInfo.image
+                          ? URL.createObjectURL(signUpInfo.image)
                           : signinLogo
                       }
                       alt=""
@@ -164,7 +176,7 @@ const Signup = () => {
                     name="name"
                     type="text"
                     onChange={handleChange}
-                    value={data.name}
+                    value={signUpInfo.name}
                     className="bg-transparent border border-gray-400 w-full text-gray-800 text-sm pl-4 pr-10 py-2.5 rounded focus:border-black outline-none"
                     placeholder="Enter name"
                   />
@@ -177,7 +189,7 @@ const Signup = () => {
                     name="email"
                     type="text"
                     onChange={handleChange}
-                    value={data.email}
+                    value={signUpInfo.email}
                     className="bg-transparent border border-gray-400 w-full text-gray-800 text-sm pl-4 pr-10 py-2.5 rounded focus:border-black outline-none"
                     placeholder="Enter email"
                   />
@@ -191,7 +203,7 @@ const Signup = () => {
                       name="password"
                       type={showPassword ? "text" : "password"}
                       onChange={handleChange}
-                      value={data.password}
+                      value={signUpInfo.password}
                       className="bg-transparent border border-gray-400 w-full text-gray-800 text-sm pl-4 pr-10 py-2.5 rounded focus:border-black outline-none"
                       placeholder="Enter password"
                     />

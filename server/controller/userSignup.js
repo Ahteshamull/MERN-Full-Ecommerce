@@ -41,8 +41,8 @@ const userSignup = async (req, res) => {
     await user.save();
 
     return res.status(201).send({
-      success: true,
       message: "User created successfully",
+      success: true,
       data: user,
     });
   } catch (error) {
