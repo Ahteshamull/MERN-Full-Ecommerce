@@ -27,7 +27,7 @@ const UserSchema = new Schema(
     },
   },
   {
-    timeseries: true,
+    timestamps: true,
   }
 );
 

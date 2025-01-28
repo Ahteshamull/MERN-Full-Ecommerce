@@ -64,7 +64,7 @@ const App = () => {
       if (dataApi.success) {
         dispatch(setUser(dataApi.data));
       }
-      console.log("dataApi", dataApi);
+    
     } catch (error) {
       console.error("Error fetching user details:", error);
     }

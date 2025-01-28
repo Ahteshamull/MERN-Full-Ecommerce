@@ -1,8 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { handleError, handleSuccess } from "../Util";
+import moment from "moment";
+import { FaEdit } from "react-icons/fa";
+import ChangeUserRole from "../components/ChangeUserRole";
 
 const AllUsers = () => {
   const [allUsers, setAllUsers] = useState([]);
+  const [openUpdateUserRole ,setOpenUpdateUserRole] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null); // To track the user whose role is being changed
+
   const fetchAllUser = async () => {
     try {
       const fetchData = await fetch("http://localhost:3000/auth/all-users", {
@@ -14,33 +20,77 @@ const AllUsers = () => {
       });
       const response = await fetchData.json();
       const { success, message, error } = response;
-      // if (success) {
-      //   handleSuccess(message);
-      // }
-      // if (!success) {
-      //   handleError(message);
-      // }
+      if (success) {
+        setAllUsers(response.data);
+      } else if (error) {
+        handleError(error);
+      }
     } catch (error) {
       handleError(error);
     }
   };
+
   useEffect(() => {
     fetchAllUser();
   }, []);
+
+  const handleChangeRole = (user) => {
+    // Set the selected user when edit button is clicked
+    setSelectedUser(user);
+  };
+
   return (
-    <div className="bg-white pb-4">
-   
-        <table className="w-full">
-          <thead className="bg-white">
-            <th className=" border text-base font-medium">Sr.</th>
-            <th className=" border text-base font-medium">Sr.</th>
-            <th className=" border text-base font-medium">Sr.</th>
-            <th className=" border text-base font-medium">Sr.</th>
-            <th className=" border text-base font-medium">Sr.</th>
-          </thead>
-        </table>
-      </div>
-  
+    <div className="overflow-x-auto w-full">
+      <table className="w-full table-auto border-collapse">
+        <thead className="bg-gray-200">
+          <tr>
+            <th className="px-4 py-2 text-left">Sr.</th>
+            <th className="px-4 py-2 text-left">Name</th>
+            <th className="px-4 py-2 text-left">Email</th>
+            <th className="px-4 py-2 text-left">Role</th>
+            <th className="px-4 py-2 text-left">Create Date</th>
+            <th className="px-4 py-2 text-left">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {allUsers.map((user, index) => (
+            <tr key={user.sr} className="border-b hover:bg-gray-50">
+              <td className="px-4 py-2">{index + 1}</td>
+              <td className="px-4 py-2">{user?.name}</td>
+              <td className="px-4 py-2">{user?.email}</td>
+              <td className="px-4 py-2">{user?.role}</td>
+              <td className="px-4 py-2">
+                {moment(user.createdAt).format("Do MMMM YYYY, h:mm A")}
+              </td>
+              <td className="px-4 py-2">
+                <button
+                  onClick={() => handleChangeRole(user)} // Pass the selected user to the handler
+                  className="px-2 py-2 rounded-lg text-sm tracking-wider font-medium border border-current outline-none bg-transparent hover:bg-green-700 text-green-700 hover:text-white transition-all duration-300"
+                >
+                  <FaEdit size={22} />
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      {selectedUser && (
+        
+        <ChangeUserRole
+          user={selectedUser}
+          onSubmit={(updatedUser) => {
+            
+            setAllUsers((prevUsers) =>
+              prevUsers.map((user) =>
+                user.sr === updatedUser.sr ? updatedUser : user
+              )
+            );
+            setSelectedUser(null);
+          }}
+        />
+      )}
+    </div>
   );
 };
 

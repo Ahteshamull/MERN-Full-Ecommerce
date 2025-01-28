@@ -44,9 +44,9 @@ const AdminPanel = () => {
           </nav>
         </div>
       </aside>
-          <main>
+          <main className="w-full">
               
-             <Dashboard/>
+             <Dashboard />
       </main>
     </div>
   );

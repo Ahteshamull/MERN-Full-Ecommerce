@@ -46,7 +46,7 @@ const userSignup = async (req, res) => {
       data: user,
     });
   } catch (error) {
-    console.error("Error during user creation:", error); // More detailed error logging
+  // More detailed error logging
 
     // Handle different types of errors
     if (error.code === 11000) {

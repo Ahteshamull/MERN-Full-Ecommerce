@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router";
+import { Link } from "react-router-dom"; // Ensure to use 'react-router-dom' for routing
 import { FaRegCircleUser } from "react-icons/fa6";
 import { BsCart3 } from "react-icons/bs";
 import logo from "../assets/headerImg.png";
@@ -10,49 +10,45 @@ import { setUser } from "../store/userSlices";
 
 const Header = () => {
   const user = useSelector((state) => state?.user?.user);
-  const dispatch = useDispatch()
-  const [menu, setMenu] = useState(false)
-
-
-
-
-
-
-
-
-
+  const dispatch = useDispatch();
+  const [menu, setMenu] = useState(false);
 
   const handleLogout = async () => {
-    const fetchData = await fetch("http://localhost:3000/auth/user-logout", {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    });
-    const response = await fetchData.json();
-    const { error, success, message } = response;
-    
-  if (success) {
-    handleSuccess(message);
-    dispatch(setUser(null))
-    // Show success message
-    localStorage.removeItem("token"); // Log out the user
+    try {
+      const fetchData = await fetch("http://localhost:3000/auth/user-logout", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+      const response = await fetchData.json();
+      const { error, success, message } = response;
 
-    // Delay navigation by 1 second (1000 milliseconds)
-    setTimeout(() => {
-      window.location.href = "/"; // Redirect to home page after delay
-    }, 1000);
-  } else if (error) {
-    handleError(message); // Show error message
-  }
+      if (success) {
+        handleSuccess(message);
+        dispatch(setUser(null)); // Clear user from Redux
+        localStorage.removeItem("token"); // Log out the user
+
+        // Delay navigation by 1 second
+        setTimeout(() => {
+          window.location.href = "/"; // Redirect to home page after delay
+        }, 1000);
+      } else if (error) {
+        handleError(message); // Show error message
+      }
+    } catch (error) {
+      handleError(
+        "An error occurred while logging out. Please try again later."
+      );
+    }
   };
-  
+
   return (
     <header className="bg-white py-1 shadow-md">
       <div className="container mx-auto h-full flex justify-between items-center px-4">
         <Link to={"/"}>
-          <div className=" w-20">
+          <div className="w-20">
             <img src={logo} alt="headerImage" />
           </div>
         </Link>
@@ -72,50 +68,52 @@ const Header = () => {
             </button>
           </div>
         </div>
-        <div className="flex gap-6 items-center text-center ">
-          <Link to={"/contact"}>
-            <div
-              className="relative group flex justify-center"
-              onClick={() => setMenu((prev) => !prev)}
-            >
-              <div>
-                {user?.image ? (
-                  <img
-                    src={user?.image}
-                    alt="user"
-                    className="w-10 h-10 rounded-full"
-                  />
-                ) : (
-                  <span>
-                    <FaRegCircleUser size={30} />
-                  </span>
-                )}
-              </div>
-              {menu && (
-                <div className=" md:block absolute bg-white bottom-0    h-fit p-4 top-11 shadow-lg rounded-sm hidden group-hover:block">
-                  <nav>
-                    <Link
-                      onClick={() => setMenu((prev) => !prev)}
-                      to={"/admin-panel"}
-                      className="whitespace-nowrap hidden md:block hover:bg-slate-100 p-2"
-                    >
-                      Admin Panel
-                    </Link>
-                  </nav>
-                </div>
+
+        <div className="flex gap-6 items-center text-center">
+          <div
+            className="relative group flex justify-center"
+            onClick={() => setMenu((prev) => !prev)} // Toggle menu on user icon click
+          >
+            <div>
+              {user?.image ? (
+                <img
+                  src={user?.image}
+                  alt="user"
+                  className="w-10 h-10 rounded-full"
+                />
+              ) : (
+                <span>
+                  <FaRegCircleUser size={30} />
+                </span>
               )}
             </div>
-          </Link>
+
+            {menu && (
+              <div className="absolute bg-white bottom-0 top-11 h-fit p-2 shadow-lg rounded">
+                <nav>
+                  <Link
+                    onClick={() => setMenu((prev) => !prev)}
+                    to={"/admin-panel"}
+                    className="whitespace-nowrap hidden md:block hover:bg-slate-100 p-2"
+                  >
+                    Admin Panel
+                  </Link>
+                </nav>
+              </div>
+            )}
+          </div>
+
           <Link to={"/card"}>
             <div className="relative">
               <span>
                 <BsCart3 size={30} />
               </span>
               <div className="bg-red-500 absolute top-[-5px] right-[-5px] text-white p-1 w-5 h-5 flex items-center justify-center rounded-full">
-                <p className=" text-xs ">0</p>
+                <p className=" text-xs">0</p>
               </div>
             </div>
           </Link>
+
           {user?._id ? (
             <button
               onClick={handleLogout}
@@ -125,15 +123,14 @@ const Header = () => {
             </button>
           ) : (
             <Link to={"/login"}>
-              <div>
-                <button className="px-5 py-2.5 rounded-lg text-white text-sm tracking-wider font-medium border border-current outline-none bg-gradient-to-tr hover:bg-gradient-to-tl from-blue-700 to-blue-300">
-                  Login
-                </button>
-              </div>
+              <button className="px-5 py-2.5 rounded-lg text-white text-sm tracking-wider font-medium border border-current outline-none bg-gradient-to-tr hover:bg-gradient-to-tl from-blue-700 to-blue-300">
+                Login
+              </button>
             </Link>
           )}
         </div>
       </div>
+
       <ToastContainer />
     </header>
   );
