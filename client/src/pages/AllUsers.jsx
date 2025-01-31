@@ -6,8 +6,13 @@ import ChangeUserRole from "../components/ChangeUserRole";
 
 const AllUsers = () => {
   const [allUsers, setAllUsers] = useState([]);
-  const [openUpdateUserRole ,setOpenUpdateUserRole] = useState(false);
-  const [selectedUser, setSelectedUser] = useState(null); // To track the user whose role is being changed
+  const [openUpdateUserRole, setOpenUpdateUserRole] = useState(false);
+  const [updateUserDetails, setUpdateUserDetails] = useState({
+    email: "",
+    name: "",
+    role: "",
+    _id:""
+  });
 
   const fetchAllUser = async () => {
     try {
@@ -34,10 +39,7 @@ const AllUsers = () => {
     fetchAllUser();
   }, []);
 
-  const handleChangeRole = (user) => {
-    // Set the selected user when edit button is clicked
-    setSelectedUser(user);
-  };
+ 
 
   return (
     <div className="overflow-x-auto w-full">
@@ -54,6 +56,7 @@ const AllUsers = () => {
         </thead>
         <tbody>
           {allUsers.map((user, index) => (
+      
             <tr key={user.sr} className="border-b hover:bg-gray-50">
               <td className="px-4 py-2">{index + 1}</td>
               <td className="px-4 py-2">{user?.name}</td>
@@ -64,7 +67,10 @@ const AllUsers = () => {
               </td>
               <td className="px-4 py-2">
                 <button
-                  onClick={() => handleChangeRole(user)} // Pass the selected user to the handler
+                  onClick={() => {
+                    setUpdateUserDetails(user);
+                    setOpenUpdateUserRole(true);
+                  }}
                   className="px-2 py-2 rounded-lg text-sm tracking-wider font-medium border border-current outline-none bg-transparent hover:bg-green-700 text-green-700 hover:text-white transition-all duration-300"
                 >
                   <FaEdit size={22} />
@@ -74,20 +80,14 @@ const AllUsers = () => {
           ))}
         </tbody>
       </table>
-
-      {selectedUser && (
-        
+      {openUpdateUserRole && (
         <ChangeUserRole
-          user={selectedUser}
-          onSubmit={(updatedUser) => {
-            
-            setAllUsers((prevUsers) =>
-              prevUsers.map((user) =>
-                user.sr === updatedUser.sr ? updatedUser : user
-              )
-            );
-            setSelectedUser(null);
-          }}
+          onClose={() => setOpenUpdateUserRole(false)}
+          name={updateUserDetails.name}
+          email={updateUserDetails.email}
+          role={updateUserDetails.role}
+          userId={updateUserDetails._id}
+          callFunction={fetchAllUser}
         />
       )}
     </div>

@@ -1,8 +1,16 @@
 import React, { useState } from "react";
 import ROLE from "../common/role";
 import { FaWindowClose } from "react-icons/fa";
+import { handleSuccess } from "../Util";
 
-const ChangeUserRole = ({ name, email, role, onClose }) => {
+const ChangeUserRole = ({
+  name,
+  email,
+  role,
+  userId,
+  onClose,
+  callFunction,
+}) => {
   const [UserRole, setUserRole] = useState(role);
 
   const handleOnchange = (e) => {
@@ -17,17 +25,19 @@ const ChangeUserRole = ({ name, email, role, onClose }) => {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
       body: JSON.stringify({
-        userId: localStorage.getItem("userId"), // Ensure userId is stored correctly
+        userId: userId, // Ensure userId is stored correctly
         role: UserRole, // Use the updated UserRole state here
       }),
     });
 
     const updatedUser = await response.json();
-    console.log(updatedUser);
 
-    // Optionally call onClose to close the form after successful role change
-    if (response.ok) {
+    const { success, message, error } = updatedUser;
+
+    if (success) {
+      handleSuccess(message);
       onClose();
+      callFunction()
     }
   };
 

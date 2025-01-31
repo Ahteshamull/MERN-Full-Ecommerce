@@ -7,11 +7,11 @@ async function updateUser(req, res) {
     const payload = {
       ...(email && { email: email }),
       ...(name && { name: name }),
-      ...(role && { email: role }),
+      ...(role && { role: role }),
     };
 
     const user = await userModel.findById(sessionUser);
-    console.log(user.role);
+
     const UpdateUser = await userModel.findByIdAndUpdate(userId, payload);
     return res.status(201).send({
       success: true,

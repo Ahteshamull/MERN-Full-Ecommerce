@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { handleError, handleSuccess } from "./../Util";
 import { ToastContainer } from "react-toastify";
 import { setUser } from "../store/userSlices";
+import ROLE from './../common/role';
 
 const Header = () => {
   const user = useSelector((state) => state?.user?.user);
@@ -71,10 +72,11 @@ const Header = () => {
 
         <div className="flex gap-6 items-center text-center">
           <div
-            className="relative group flex justify-center"
-            onClick={() => setMenu((prev) => !prev)} // Toggle menu on user icon click
-          >
-            <div>
+            className="relative group flex justify-center">
+            {
+              user?._id && (
+                
+            <div onClick={() => setMenu((prev) => !prev)}>
               {user?.image ? (
                 <img
                   src={user?.image}
@@ -87,17 +89,22 @@ const Header = () => {
                 </span>
               )}
             </div>
+              )
+            }
 
             {menu && (
               <div className="absolute bg-white bottom-0 top-11 h-fit p-2 shadow-lg rounded">
                 <nav>
+                  {user?.role == ROLE.ADMIN && (
+                    
                   <Link
                     onClick={() => setMenu((prev) => !prev)}
-                    to={"/admin-panel"}
+                    to={"/admin-panel/all-products"}
                     className="whitespace-nowrap hidden md:block hover:bg-slate-100 p-2"
                   >
                     Admin Panel
                   </Link>
+                  )}
                 </nav>
               </div>
             )}

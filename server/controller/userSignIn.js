@@ -37,7 +37,7 @@ const userLogin = async (req, res) => {
      
 
       // Set token expiration based on role
-      const tokenExpiry = existingUser.role === "ADMIN" ? "5m" : "24h";
+      const tokenExpiry = existingUser.role === "ADMIN" ? "1h" : "24h";
       const tokenData = {
         _id: existingUser._id,
         email: existingUser.email,
