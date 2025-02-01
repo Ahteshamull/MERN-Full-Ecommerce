@@ -13,9 +13,10 @@ app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/auth", router);
+app.use("/product", router);
 
 app.use((req, res) => {
-  return res.status(404).send("404 Not Found");
+  return res.status(404).send("No api Found");
 });
 app.listen(process.env.PORT || 8080, () => {
   console.log("Server Is Running");
