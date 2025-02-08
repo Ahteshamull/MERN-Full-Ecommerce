@@ -44,7 +44,7 @@ const Footer = () => {
                   />
                 </svg>
               </div>
-              <Link className="text-gray-300 text-sm ml-3">
+              <Link className="text-gray-200 text-sm ml-3">
                 <small className="block">Tel</small>
                 <strong>180-548-2588</strong>
               </Link>
