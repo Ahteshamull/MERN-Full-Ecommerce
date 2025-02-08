@@ -81,7 +81,7 @@ const Header = () => {
                 <img
                   src={user?.image}
                   alt="user"
-                  className="w-10 h-10 rounded-full"
+                  className="w-10 h-10 rounded-full cursor-pointer"
                 />
               ) : (
                 <span>
@@ -100,7 +100,7 @@ const Header = () => {
                   <Link
                     onClick={() => setMenu((prev) => !prev)}
                     to={"/admin-panel/all-products"}
-                    className="whitespace-nowrap hidden md:block hover:bg-slate-100 p-2"
+                    className="whitespace-nowrap  hidden md:block hover:bg-slate-100 p-2"
                   >
                     Admin Panel
                   </Link>

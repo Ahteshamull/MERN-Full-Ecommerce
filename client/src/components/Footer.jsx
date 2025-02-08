@@ -12,7 +12,7 @@ const Footer = () => {
           </p>
         </div>
 
-        <div className="container mx-auto">
+        {/* <div className="container mx-auto">
           <div className="max-w-2xl mx-auto text-center">
             <Link className="inline-block" to={"/"}>
            
@@ -120,7 +120,7 @@ const Footer = () => {
               © Hasan. All rights reserved.
             </p>
           </div>
-        </div>
+        </div> */}
       </footer>
     </footer>
   );

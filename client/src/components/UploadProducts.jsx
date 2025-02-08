@@ -63,7 +63,7 @@ const UploadProduct = ({ onClose }) => {
     e.preventDefault();
     try {
       const response = await axios.post(
-        "http://localhost:3000/product/upload/product",
+        "http://localhost:3000/product/update/products",
         data,
         {
           headers: {
@@ -102,14 +102,14 @@ const UploadProduct = ({ onClose }) => {
 
   return (
     <div className="fixed w-full top-0 left-0 h-full mx-auto flex items-center justify-center p-4 bg-slate-200 bg-opacity-35 rounded-lg shadow-md overflow-hidden">
-      <div className="bg-white p-4 w-full rounded max-w-2xl h-full max-h-[80%] ">
+      <div className="bg-white p-10 w-full rounded max-w-2xl h-full max-h-[80%] ">
         <div className="flex justify-between items-start">
           <div>
             <h2 className="text-lg font-medium">Upload Product :</h2>
           </div>
           <div
             onClick={onClose}
-            className="px-5 py-2.5 rounded-lg text-sm tracking-wider font-medium outline-none bg-transparent hover:bg-red-700 text-red-700 hover:text-white transition-all duration-300"
+            className="px-1 py-1 rounded-lg text-sm tracking-wider font-medium outline-none bg-transparent hover:bg-red-700 text-red-700 hover:text-white transition-all duration-300"
           >
             <FaRegWindowClose size={20} />
           </div>
