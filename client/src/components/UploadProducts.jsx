@@ -9,7 +9,7 @@ import { ToastContainer, toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { handleSuccess } from "./../Util";
 
-const UploadProduct = ({ onClose }) => {
+const UploadProduct = ({ onClose,fetchData }) => {
   const [data, setData] = useState({
     image: [], // Initialize as an empty array
     name: "",
@@ -21,7 +21,7 @@ const UploadProduct = ({ onClose }) => {
   });
   const [openFullScreen, setOpenFullScreen] = useState(false);
   const [fullScreenImage, setFullScreenImage] = useState("");
-  const navigate = useNavigate();
+ 
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -55,7 +55,7 @@ const UploadProduct = ({ onClose }) => {
     newProductImage.splice(index, 1);
     setData((prevData) => ({
       ...prevData,
-      image: newProductImage,
+      image: [...newProductImage],
     }));
   };
 

@@ -8,27 +8,27 @@ import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import { handleSuccess } from "./../Util";
 
-const AdminEditProduct = ({ onClose, data, fetchData }) => {
+const AdminEditProduct = ({ onClose, productData, fetchData }) => {
   const [openFullScreen, setOpenFullScreen] = useState(false);
   const [fullScreenImage, setFullScreenImage] = useState("");
 
-  // Initialize state with prop `data` if available, otherwise default to empty values for adding
-  const [formData, setFormData] = useState({
-    _id: data?._id || "", // Empty for add
-    image: data?.image || [],
-    name: data?.name || "",
-    description: data?.description || "",
-    category: data?.category || "",
-    brand: data?.brand || "",
-    price: data?.price || "",
-    sellingPrice: data?.sellingPrice || "",
+  // Initialize form data, either using productData for update or empty for new product
+  const [data, setData] = useState({
+    ...productData,
+    image: productData?.image || [],
+    name: productData?.name || "",
+    description: productData?.description || "",
+    category: productData?.category || "",
+    brand: productData?.brand || "",
+    price: productData?.price || "",
+    sellingPrice: productData?.sellingPrice || "",
   });
 
   // Handle form data change
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
+    setData((prev) => ({
+      ...prev,
       [name]: value,
     }));
   };
@@ -38,11 +38,10 @@ const AdminEditProduct = ({ onClose, data, fetchData }) => {
     const file = e.target.files[0];
     try {
       const uploadProductCloudinary = await UploadImage(file);
-
       if (uploadProductCloudinary?.secure_url) {
-        setFormData((prevData) => ({
-          ...prevData,
-          image: [...prevData.image, uploadProductCloudinary.secure_url],
+        setData((prev) => ({
+          ...prev,
+          image: [...prev.image, uploadProductCloudinary.secure_url],
         }));
       } else {
         handleError("Failed to upload image");
@@ -55,10 +54,10 @@ const AdminEditProduct = ({ onClose, data, fetchData }) => {
 
   // Handle image deletion
   const handleDeleteImage = (index) => {
-    const newProductImage = [...formData.image];
+    const newProductImage = [...data.image];
     newProductImage.splice(index, 1);
-    setFormData((prevData) => ({
-      ...prevData,
+    setData((prev) => ({
+      ...prev,
       image: newProductImage,
     }));
   };
@@ -67,53 +66,46 @@ const AdminEditProduct = ({ onClose, data, fetchData }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const endpoint = data ? "update/products" : "add/products"; // Use different endpoints for add/update
-      const method = data ? "post" : "post"; // You can use a different method for "add" if needed
+      // API endpoint for update
+      const endpoint = 
+         `http://localhost:3000/product/update/products`
+      
 
-      // Ensure the _id is included for update, otherwise it will be added in the backend
-      const updatedFormData = {
-        ...formData,
-        _id: formData._id || undefined, // Only include _id for update
-      };
-
-      const response = await axios.post(
-        `http://localhost:3000/product/update/products`, // Dynamic URL for adding or updating
-        updatedFormData,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
+      const response = await axios.post(endpoint, data, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
 
       const result = response.data;
-      console.log(result);
-      const { success, message, error } = result;
+      console.log(result)
+      // const { success, message, error } = result;
 
-      if (success) {
-        handleSuccess(message); // Handle success notification
-        fetchData(); // Refresh data after update or add
-        setTimeout(() => {
-          onClose(); // Close modal after successful operation
-        }, 1000);
-      } else if (error) {
-        handleError(
-          error.details?.[0]?.message || error || "Something went wrong!"
-        );
-      }
+      // if (success) {
+      //   handleSuccess(message); // Handle success notification
+      //   fetchData(); // Refresh data after update or add
+      //   setTimeout(() => {
+      //     onClose(); // Close modal after successful operation
+      //   }, 1000);
+      // } else if (error) {
+      //   handleError(
+      //     error.details?.[0]?.message || error || "Something went wrong!"
+      //   );
+      // }
     } catch (err) {
       const { response } = err;
-      if (response && response.data) {
-        const { error, success, message } = response.data;
-        if (success) {
-          handleSuccess(message);
-        } else {
-          handleError(message || "An unexpected error occurred.");
-        }
-      } else {
-        handleError("Network or server error.");
-      }
+      console.log(response)
+      // if (response && response.data) {
+      //   const { error, success, message } = response.data;
+      //   if (success) {
+      //     handleSuccess(message);
+      //   } else {
+      //     handleError(message || "An unexpected error occurred.");
+      //   }
+      // } else {
+      //   handleError("Network or server error.");
+      // }
     }
   };
 
@@ -129,7 +121,7 @@ const AdminEditProduct = ({ onClose, data, fetchData }) => {
           <div className="flex justify-between items-start">
             <div>
               <h2 className="text-lg font-medium">
-                {data ? "Edit Product" : "Add New Product"}
+                {productData ? "Edit Product" : "Add New Product"}
               </h2>
             </div>
             <div
@@ -165,10 +157,10 @@ const AdminEditProduct = ({ onClose, data, fetchData }) => {
                   </div>
                 </div>
               </label>
-              <div className="">
-                {formData?.image.length > 0 ? (
-                  <div className="flex items-start gap-2 mt-2 ">
-                    {formData.image.map((img, index) => (
+              <div className="mt-2">
+                {data?.image.length > 0 ? (
+                  <div className="flex items-start gap-2 mt-2">
+                    {data.image.map((img, index) => (
                       <div className="relative group" key={index}>
                         <img
                           onClick={() => {
@@ -199,7 +191,125 @@ const AdminEditProduct = ({ onClose, data, fetchData }) => {
             </div>
 
             {/* Product Name */}
-            {/* Other fields like description, price, category, brand, etc. remain the same */}
+            <div className="mb-4">
+              <label
+                htmlFor="name"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Product Name
+              </label>
+              <input
+                onChange={handleChange}
+                type="text"
+                id="name"
+                name="name"
+                placeholder="Enter the product name"
+                value={data.name}
+                required
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
+              />
+            </div>
+
+            {/* Product Description */}
+            <div className="mb-4">
+              <label
+                htmlFor="description"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Product Description
+              </label>
+              <textarea
+                onChange={handleChange}
+                id="description"
+                name="description"
+                placeholder="Enter the product description"
+                value={data.description}
+                required
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
+              ></textarea>
+            </div>
+
+            {/* Product Category */}
+            <div className="mb-4">
+              <label
+                htmlFor="category"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Product Category
+              </label>
+              <select
+                onChange={handleChange}
+                value={data.category}
+                name="category"
+              >
+                <option value={" "}>Select Category</option>
+                {ProductCetagory.map((item, index) => (
+                  <option value={item.value} key={item.value + index}>
+                    {item.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Product Brand */}
+            <div className="mb-4">
+              <label
+                htmlFor="brand"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Product Brand
+              </label>
+              <input
+                onChange={handleChange}
+                type="text"
+                id="brand"
+                name="brand"
+                placeholder="Enter the product brand"
+                value={data.brand}
+                required
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
+              />
+            </div>
+
+            {/* Product Price */}
+            <div className="mb-4">
+              <label
+                htmlFor="price"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Product Price
+              </label>
+              <input
+                onChange={handleChange}
+                type="number"
+                id="price"
+                name="price"
+                placeholder="Enter the product price"
+                value={data.price}
+                required
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
+              />
+            </div>
+
+            {/* Selling Price */}
+            <div className="mb-4">
+              <label
+                htmlFor="sellingPrice"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Selling Price
+              </label>
+              <input
+                onChange={handleChange}
+                type="number"
+                id="sellingPrice"
+                name="sellingPrice"
+                placeholder="Enter the product Selling Price"
+                value={data.sellingPrice}
+                required
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
+              />
+            </div>
 
             {/* Submit Button */}
             <div className="flex justify-center">
@@ -207,7 +317,7 @@ const AdminEditProduct = ({ onClose, data, fetchData }) => {
                 type="submit"
                 className="w-full px-4 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50"
               >
-                {data ? "Update Product" : "Add Product"}
+                {productData ? "Update Product" : "Add Product"}
               </button>
             </div>
           </form>
