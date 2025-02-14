@@ -24,11 +24,12 @@ const AdminProductCart = ({ data, fetchData }) => {
         </div>
         {editProduct && (
           <AdminEditProduct
-            ProductData={data}
+            productData={data}
             fetchData={fetchData}
             onClose={() => setEditProduct(false)}
-          />
-        )}
+            />
+          )}
+          {console.log(data)}
       </div>
     </div>
   );

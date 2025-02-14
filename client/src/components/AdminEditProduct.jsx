@@ -66,49 +66,31 @@ const AdminEditProduct = ({ onClose, productData, fetchData }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      // API endpoint for update
-      const endpoint = 
-         `http://localhost:3000/product/update/products`
       
-
-      const response = await axios.post(endpoint, data, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
-
+      const response = await axios.post(
+        "http://localhost:3000/product/update/products", data,{
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
       const result = response.data;
-      console.log(result)
-      // const { success, message, error } = result;
+      const { success, message } = result;
+      if (success) {
+        handleSuccess(message)
+        setTimeout(() => {
+          onClose();
+          fetchData();
+        }, 1000);
+      }
 
-      // if (success) {
-      //   handleSuccess(message); // Handle success notification
-      //   fetchData(); // Refresh data after update or add
-      //   setTimeout(() => {
-      //     onClose(); // Close modal after successful operation
-      //   }, 1000);
-      // } else if (error) {
-      //   handleError(
-      //     error.details?.[0]?.message || error || "Something went wrong!"
-      //   );
-      // }
-    } catch (err) {
-      const { response } = err;
-      console.log(response)
-      // if (response && response.data) {
-      //   const { error, success, message } = response.data;
-      //   if (success) {
-      //     handleSuccess(message);
-      //   } else {
-      //     handleError(message || "An unexpected error occurred.");
-      //   }
-      // } else {
-      //   handleError("Network or server error.");
-      // }
+    } catch (error) {
+      handleError(error.message  || "Failed to update product");
     }
-  };
-
+    console.log(result)
+    
+  }
   // Display error messages using toast
   const handleError = (message) => {
     toast.error(message);
